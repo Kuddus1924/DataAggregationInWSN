@@ -163,9 +163,12 @@ public class Node {
                 if(FuncConst.FunctionH(this.seqNumber,this.id) < FuncConst.FunctionG(c)) {
                     Message message = new Message(id, c,getEncrypt(c,agr,this.seqNumber,true),getByteMac(1,c,agr,xorMac(mac),this.seqNumber,true),true,this.idParants);//если лидер
                 }
-                else
-                {
-                    Message message = new Message(id,c,getEncrypt(c,agr,this.seqNumber,false),getByteMac(0,c,agr,xorMac(mac),seqNumber,true),false,idParants);//если не лидер
+                else {
+                    if (idParants == 0) {
+                        Message message = new Message(id, c, getEncrypt(c, agr, this.seqNumber, true), getByteMac(0, c, agr, xorMac(mac), seqNumber, true), false, idParants);//если не лидер
+                    } else {
+                        Message message = new Message(id, c, getEncrypt(c, agr, this.seqNumber, false), getByteMac(0, c, agr, xorMac(mac), seqNumber, true), false, idParants);//если не лидер
+                    }
                 }
                 return message;
             }
@@ -260,6 +263,14 @@ public class Node {
         }
         return xor;
     }
+    public void setMessageStore(Message mes)
+    {
+        if(mes.recipient == this.id)
+        {
+            messageStore.add(mes);
+        }
+    }
+
 
 
 }
