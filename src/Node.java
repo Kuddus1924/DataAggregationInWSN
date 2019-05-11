@@ -17,11 +17,11 @@ public class Node {
     private HashMap<Integer, SecretKey> keyStore = new HashMap<>();
     private ArrayList<Message> messageStore = new ArrayList();
     private ArrayList<Integer> descendants = new ArrayList<>();
+    private ArrayList<int[]> shippingTable = new ArrayList<>();
     private SecretKey keyPair;
     private SecretKey keyBS;
     private boolean isNotEndNode;
     private String algo = "HMACMD5";
-    private String secAlgo = "AES/CBC/NoPadding (128)";
     private int idParants;
     private KeyGenerator gen;
     private Message message;
@@ -108,8 +108,11 @@ public class Node {
         return false;
     }
 
-    public byte[] generateEncryptMessage(byte[] message) throws Exception {
+    public byte[] generateEncryptMessage(byte[] message, boolean bs) throws Exception {
         Cipher cipher = Cipher.getInstance("AES/CTR/NoPadding");
+        if(bs)
+        cipher.init(Cipher.ENCRYPT_MODE, keyBS);
+        else
         cipher.init(Cipher.ENCRYPT_MODE, keyPair);
         return cipher.doFinal(message);
     }
@@ -123,38 +126,18 @@ public class Node {
 
     public Message getMessage(int count) {
         if (!isNotEndNode) {
-            byte[] flag = ByteBuffer.allocate(4).putInt(0).array();
-            byte[] id = ByteBuffer.allocate(4).putInt(this.id).array();
-            byte[] c = ByteBuffer.allocate(4).putInt(1).array();
-            byte[] pp = ByteBuffer.allocate(4).putInt(physicalPhenomenon).array();
-            byte[] sq = ByteBuffer.allocate(4).putInt(count).array();
-            byte[] mes = ArrayUtils.addAll(c, pp);
-            byte[] encrypt = null;
-            mes = ArrayUtils.addAll(mes, sq);
-            try {
-                encrypt = generateEncryptMessage(mes);
-            } catch (Exception e) {
-                System.out.println(e.getMessage());
-                return null;
-            }
-            byte[] toMac = ArrayUtils.addAll(flag, c);
-            toMac = ArrayUtils.addAll(toMac, id);
-            toMac = ArrayUtils.addAll(toMac, pp);
-            toMac = ArrayUtils.addAll(toMac, sq);
-            byte[] mac = getMAC(toMac);
-            Message message = new Message(this.id, 1, encrypt, mac, false, idParants);
+            Message message = new Message(this.id, 1, getEncrypt(1,this.physicalPhenomenon,seqNumber,false), getByteMac(0,1,this.physicalPhenomenon,null,this.seqNumber,false), false, idParants);
             this.message = message;
             return message;
         } else
             return null;
     }
 
-    public Message getMessageParants(int count,boolean flag) {
+    public Message getMessageParants(int count) {
         if (isNotEndNode) {
             ArrayList<Integer> agregation = new ArrayList<>();
             ArrayList<byte[]> mac = new ArrayList<>();
             ArrayList<Integer> counts = new ArrayList<>();
-            if (flag) {
                 for (int i = 0; i < messageStore.size(); i++) {
                     Message tmp = messageStore.get(i);
                     if (tmp.flag == false) {
@@ -175,17 +158,36 @@ public class Node {
                     }
                 }
                 int c = sum(counts);
+                agregation.add(this.physicalPhenomenon);
+                int agr = sum(agregation)/agregation.size();
                 if(FuncConst.FunctionH(this.seqNumber,this.id) < FuncConst.FunctionG(c)) {
-                    Message message = new Message(id, )//если лидер
+                    Message message = new Message(id, c,getEncrypt(c,agr,this.seqNumber,true),getByteMac(1,c,agr,xorMac(mac),this.seqNumber,true),true,this.idParants);//если лидер
                 }
                 else
                 {
-                    Message message = new Message(id,c, )//если не лидер
+                    Message message = new Message(id,c,getEncrypt(c,agr,this.seqNumber,false),getByteMac(0,c,agr,xorMac(mac),seqNumber,true),false,idParants);//если не лидер
                 }
+                return message;
+            }
+        return  null;
+    }
+    private ArrayList<Message> getForwardingMessage()
+    {
+        ArrayList <Message>result = new ArrayList();
+        for(int i = 0;i < messageStore.size();i++)
+        {
+            int[] store = new int[3];
+            Message tmp = messageStore.get(i);
+            if(tmp.flag) {
+                store[0] = seqNumber;
+                store[1] = tmp.getId();
+                store[2] = tmp.getGroupLeaderId();
+                shippingTable.add(store);
+                tmp.setRecipient(this.id);
+                result.add(tmp);
             }
         }
-
-
+        return result;
     }
     private int[] split(byte[] mas)
     {
@@ -210,4 +212,54 @@ public class Node {
         }
         return result;
     }
+    private byte[] getEncrypt(int c1, int pp1, int sq1,boolean bs)
+    {
+        byte[] c = ByteBuffer.allocate(4).putInt(c1).array();
+        byte[] pp = ByteBuffer.allocate(4).putInt(pp1).array();
+        byte[] sq = ByteBuffer.allocate(4).putInt(sq1).array();
+        byte[] mes = ArrayUtils.addAll(c, pp);
+        byte[] encrypt = null;
+        mes = ArrayUtils.addAll(mes, sq);
+        try {
+            encrypt = generateEncryptMessage(mes,bs);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return null;
+        }
+        return encrypt;
+    }
+    private byte[] getByteMac(int flag1,int count,int pp1,byte[] macXor,int sq1,boolean parents)
+    {
+
+        byte[] flag = ByteBuffer.allocate(4).putInt(flag1).array();
+        byte[] id = ByteBuffer.allocate(4).putInt(this.id).array();
+        byte[] c = ByteBuffer.allocate(4).putInt(count).array();
+        byte[] pp = ByteBuffer.allocate(4).putInt(pp1).array();
+        byte[] sq = ByteBuffer.allocate(4).putInt(sq1).array();
+        byte[] toMac = ArrayUtils.addAll(flag, c);
+        toMac = ArrayUtils.addAll(toMac, id);
+        toMac = ArrayUtils.addAll(toMac, pp);
+        if(parents) {
+            toMac = ArrayUtils.addAll(toMac, macXor);
+        }
+        toMac = ArrayUtils.addAll(toMac, sq);
+        byte[] mac = getMAC(toMac);
+        return mac;
+    }
+    private byte[] xorMac(ArrayList<byte[]> tmp)
+    {
+        byte[] xor = new byte[tmp.get(0).length];
+        byte[] mac;
+        for (int i = 0; i < tmp.size(); i++)
+        {
+            mac = tmp.get(i);
+            for(int j = 0;j < xor.length; j++)
+            {
+                xor[j] = (byte)(xor[j]^mac[j]);
+            }
+        }
+        return xor;
+    }
+
+
 }

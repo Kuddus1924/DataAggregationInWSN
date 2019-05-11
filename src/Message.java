@@ -5,6 +5,7 @@ public class Message {
     public byte[] mac;
     public boolean flag;
     public int recipient;
+    private int groupLeaderId;
 
     public Message(int id,int c ,byte[] encrypt, byte[] mac,boolean flag, int idRecipient)
     {
@@ -14,8 +15,19 @@ public class Message {
         this.mac = mac;
         this.flag = flag;
         this.recipient = idRecipient;
+        if(flag)
+        {
+            groupLeaderId = id;
+        }
+    }
+    public void setRecipient(int id)
+    {
+        this.recipient  = id;
     }
 
+    public int getGroupLeaderId() {
+        return groupLeaderId;
+    }
     public byte[] getEncrypt() {
         return encrypt;
     }
