@@ -1,3 +1,5 @@
+import java.nio.ByteBuffer;
+import java.util.Arrays;
 import java.util.Random;
 
 public class FuncConst {
@@ -9,6 +11,20 @@ public class FuncConst {
     {
         Random random = new Random(sq+id);
         return random.nextDouble();
+    }
+    public static int[] split(byte[] mas)
+    {
+        byte[] c = Arrays.copyOfRange(mas, 0, 3);
+        byte[] pp = Arrays.copyOfRange(mas, 4, 7);
+        byte[] sq = Arrays.copyOfRange(mas, 8, 11);
+        int[] result = new int[3];
+        ByteBuffer wrapped = ByteBuffer.wrap(c);
+        result[0] =wrapped.getInt();
+        wrapped = ByteBuffer.wrap(pp);
+        result[1] =wrapped.getInt();
+        wrapped = ByteBuffer.wrap(sq);
+        result[2] =wrapped.getInt();
+        return result;
     }
 
 

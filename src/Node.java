@@ -19,7 +19,7 @@ public class Node {
     private ArrayList<Integer> descendants = new ArrayList<>();
     private ArrayList<int[]> shippingTable = new ArrayList<>();
     private SecretKey keyPair;
-    private SecretKey keyBS;
+    private SecretKey[] keyBS;
     private boolean isNotEndNode;
     private String algo = "HMACMD5";
     private int idParants;
@@ -43,8 +43,9 @@ public class Node {
         this.keyPair = keyPair;
     }
 
-    public void setKeyBS(SecretKey keyBS) {
-        this.keyBS = keyBS;
+    public void setKeyBS(SecretKey keyBS,SecretKey macKeyBS) {
+        this.keyBS[0] = keyBS;
+        this.keyBS[1] = macKeyBS;
     }
 
     public void setSeqNumber(int seqNumber) {
@@ -63,7 +64,7 @@ public class Node {
     public byte[] getMAC(byte[] message) {
         try {
             Mac mac = Mac.getInstance(algo);
-            mac.init(keyBS);
+            mac.init(keyBS[1]);
             return mac.doFinal(message);
 
         } catch (Exception e) {
@@ -111,7 +112,7 @@ public class Node {
     public byte[] generateEncryptMessage(byte[] message, boolean bs) throws Exception {
         Cipher cipher = Cipher.getInstance("AES/CTR/NoPadding");
         if(bs)
-        cipher.init(Cipher.ENCRYPT_MODE, keyBS);
+        cipher.init(Cipher.ENCRYPT_MODE, keyBS[0]);
         else
         cipher.init(Cipher.ENCRYPT_MODE, keyPair);
         return cipher.doFinal(message);
@@ -147,7 +148,7 @@ public class Node {
                         } catch (Exception e) {
                             System.out.println(e.getMessage());
                         }
-                        int[] dec = split(decrypt);
+                        int[] dec = FuncConst.split(decrypt);
                         if (dec[2] == this.seqNumber) {
                             agregation.add(dec[1]);
                             mac.add(tmp.mac);
@@ -190,20 +191,6 @@ public class Node {
                 result.add(tmp);
             }
         }
-        return result;
-    }
-    private int[] split(byte[] mas)
-    {
-        byte[] c = Arrays.copyOfRange(mas, 0, 3);
-        byte[] pp = Arrays.copyOfRange(mas, 4, 7);
-        byte[] sq = Arrays.copyOfRange(mas, 8, 11);
-        int[] result = new int[3];
-        ByteBuffer wrapped = ByteBuffer.wrap(c);
-        result[0] =wrapped.getInt();
-        wrapped = ByteBuffer.wrap(pp);
-        result[1] =wrapped.getInt();
-        wrapped = ByteBuffer.wrap(sq);
-        result[2] =wrapped.getInt();
         return result;
     }
     private int sum(ArrayList<Integer> tmp)
@@ -270,7 +257,4 @@ public class Node {
             messageStore.add(mes);
         }
     }
-
-
-
 }
