@@ -81,7 +81,6 @@ private Random random = new Random();
     }
     public int[] decryptMessage(Message tmp) {
         byte[] decrypt = null;
-        int[] result
         try {
             decrypt = decryptMessage(tmp.encrypt,tmp.getGroupLeaderId());
         } catch (Exception e) {
@@ -95,6 +94,59 @@ private Random random = new Random();
         sq = random.nextInt();
         return sq;
     }
+    public ArrayList<Integer>  grubbsTest(ArrayList<int[]> tuples)
+    {
+        ArrayList<Integer> result = new ArrayList<>();
+        while (true) {
+            double uc = 0;
+            double sc = 0;
+            double uu = 0;
+            double su = 0;
+            for (int i = 0; i < tuples.size(); i++) {
+                uc += tuples.get(i)[1];
+                uu += tuples.get(i)[2];
+            }
+            uc /= tuples.size();
+            uu /= tuples.size();
+            for (int i = 0; i < tuples.size(); i++) {
+                sc += Math.pow(tuples.get(i)[1]- uc,2);
+                su += Math.pow(tuples.get(i)[2]- uc,2);
+            }
+            sc /= tuples.size();
+            su /= tuples.size();
+            sc = Math.sqrt(sc);
+            su = Math.sqrt(su);
+            int max = 0;
+            int agr = 0;
+            int id = 0;
+            int number = -1;
+            for (int i = 0; i < tuples.size(); i++) {
+                if(max <  tuples.get(i)[1])
+                {
+                    max =  tuples.get(i)[1];
+                    agr = tuples.get(i)[2];
+                    id = tuples.get(i)[0];
+                    number = i;
+                }
+            }
+            double Zc =(max - uc)/sc;
+            double pc = 0;//уточнить
+            double Zu = Math.abs(agr - uu)/su;
+            double pu = 0;//уточнить
+            if((pu * pc) < 0.05)
+            {
+                tuples.remove(number);
+                result.add(id);
+            }
+            else
+            {
+                break;
+            }
+        }
+        return result;
+    }
+
+
 
 
 

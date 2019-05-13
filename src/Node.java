@@ -16,15 +16,18 @@ public class Node {
     private int seqNumber;
     private HashMap<Integer, SecretKey> keyStore = new HashMap<>();
     private ArrayList<Message> messageStore = new ArrayList();
-    private ArrayList<Integer> descendants = new ArrayList<>();
+    private ArrayList<int[]> descendants = new ArrayList<>();
     private ArrayList<int[]> shippingTable = new ArrayList<>();
     private SecretKey keyPair;
     private SecretKey[] keyBS;
     private boolean isNotEndNode;
     private String algo = "HMACMD5";
     private int idParants;
+    private byte[] attestateMac;
     private KeyGenerator gen;
     private Message message;
+    private int agr = 0;
+    private int C = 0;
 
 
     public Node(int id, int idP) {
@@ -77,7 +80,6 @@ public class Node {
         if (isNotEndNode) {
             SecretKey key = gen.generateKey();
             keyStore.put(idNode, key);
-            descendants.add(idNode);
             return key;
         } else {
             System.out.println("Error! This node is not an aggregator");
@@ -156,22 +158,26 @@ public class Node {
                         } else {
                             continue;
                         }
+                        descendants.add(new int[]{tmp.getId(),tmp.getC()});
                     }
                 }
                 int c = sum(counts);
+                C = c;
+                Message mes;
                 agregation.add(this.physicalPhenomenon);
-                int agr = sum(agregation)/agregation.size();
+                agr = sum(agregation)/agregation.size();
+                attestateMac = xorMac(mac);
                 if(FuncConst.FunctionH(this.seqNumber,this.id) < FuncConst.FunctionG(c)) {
-                    Message message = new Message(id, c,getEncrypt(c,agr,this.seqNumber,true),getByteMac(1,c,agr,xorMac(mac),this.seqNumber,true),true,this.idParants);//если лидер
+                    mes = new Message(id, c,getEncrypt(c,agr,this.seqNumber,true),getByteMac(1,c,agr,xorMac(mac),this.seqNumber,true),true,this.idParants);//если лидер
                 }
                 else {
                     if (idParants == 0) {
-                        Message message = new Message(id, c, getEncrypt(c, agr, this.seqNumber, true), getByteMac(0, c, agr, xorMac(mac), seqNumber, true), false, idParants);//если не лидер
+                         mes = new Message(id, c, getEncrypt(c, agr, this.seqNumber, true), getByteMac(0, c, agr, xorMac(mac), seqNumber, true), false, idParants);//если не лидер
                     } else {
-                        Message message = new Message(id, c, getEncrypt(c, agr, this.seqNumber, false), getByteMac(0, c, agr, xorMac(mac), seqNumber, true), false, idParants);//если не лидер
+                        mes = new Message(id, c, getEncrypt(c, agr, this.seqNumber, false), getByteMac(0, c, agr, xorMac(mac), seqNumber, true), false, idParants);//если не лидер
                     }
                 }
-                return message;
+                return mes;
             }
         return  null;
     }
@@ -256,5 +262,62 @@ public class Node {
         {
             messageStore.add(mes);
         }
+    }
+    public int sumC()
+    {
+        int result = 1;
+        for(int i = 0; i < descendants.size();i++)
+        {
+            result += descendants.get(i)[1];
+        }
+        return result;
+    }
+    public int descendantsSize()
+    {
+        return descendants.size();
+    }
+    public Message attestateMes(boolean flag,int sa)
+    {
+        if(flag)
+            return new Message(id,0,getEncryptA(id,C,physicalPhenomenon,sa,true),null,false,0);
+        else
+            return new Message(id,0,getEncryptAmac(id,C,physicalPhenomenon,sa,attestateMac,true),null,false,0);
+    }
+    private byte[] getEncryptA(int id, int ca, int r,int ss,boolean bs)
+    {
+        byte[] c = ByteBuffer.allocate(4).putInt(id).array();
+        byte[] pp = ByteBuffer.allocate(4).putInt(ca).array();
+        byte[] sq = ByteBuffer.allocate(4).putInt(r).array();
+        byte[] sa = ByteBuffer.allocate(4).putInt(ss).array();
+        byte[] mes = ArrayUtils.addAll(c, pp);
+        byte[] encrypt = null;
+        mes = ArrayUtils.addAll(mes, sq);
+        mes = ArrayUtils.addAll(mes, sa);
+        try {
+            encrypt = generateEncryptMessage(mes,bs);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return null;
+        }
+        return encrypt;
+    }
+    private byte[] getEncryptAmac(int id, int ca, int r,int ss,byte[] mac,boolean bs)
+    {
+        byte[] c = ByteBuffer.allocate(4).putInt(id).array();
+        byte[] pp = ByteBuffer.allocate(4).putInt(ca).array();
+        byte[] sq = ByteBuffer.allocate(4).putInt(r).array();
+        byte[] sa = ByteBuffer.allocate(4).putInt(ss).array();
+        byte[] mes = ArrayUtils.addAll(c, pp);
+        byte[] encrypt = null;
+        mes = ArrayUtils.addAll(mes, sq);
+        mes = ArrayUtils.addAll(mes, mac);
+        mes = ArrayUtils.addAll(mes, sa);
+        try {
+            encrypt = generateEncryptMessage(mes,bs);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return null;
+        }
+        return encrypt;
     }
 }
