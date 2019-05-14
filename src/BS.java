@@ -145,9 +145,4 @@ private Random random = new Random();
         }
         return result;
     }
-
-
-
-
-
 }

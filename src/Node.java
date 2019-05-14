@@ -20,7 +20,7 @@ public class Node {
     private ArrayList<int[]> shippingTable = new ArrayList<>();
     private SecretKey keyPair;
     private SecretKey[] keyBS;
-    private boolean isNotEndNode;
+    private boolean isNotEndNode = false;
     private String algo = "HMACMD5";
     private int idParants;
     private byte[] attestateMac;
@@ -42,6 +42,14 @@ public class Node {
         messageStore.add(mes);
     }
 
+    public int getIdParants() {
+        return idParants;
+    }
+
+    public int getId() {
+        return id;
+    }
+
     public void setKeyPair(SecretKey keyPair) {
         this.keyPair = keyPair;
     }
@@ -57,10 +65,12 @@ public class Node {
 
     public void setAgregator(boolean agregator) {
         this.isNotEndNode = agregator;
-        try {
-            gen = KeyGenerator.getInstance(algo);
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
+        if(agregator) {
+            try {
+                gen = KeyGenerator.getInstance(algo);
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
         }
     }
 
@@ -127,59 +137,56 @@ public class Node {
         return cipher.doFinal(message);
     }
 
-    public Message getMessage(int count) {
-        if (!isNotEndNode) {
-            Message message = new Message(this.id, 1, getEncrypt(1,this.physicalPhenomenon,seqNumber,false), getByteMac(0,1,this.physicalPhenomenon,null,this.seqNumber,false), false, idParants);
-            this.message = message;
-            return message;
-        } else
-            return null;
-    }
-
     public Message getMessageParants(int count) {
+        this.seqNumber = count;
         if (isNotEndNode) {
             ArrayList<Integer> agregation = new ArrayList<>();
             ArrayList<byte[]> mac = new ArrayList<>();
             ArrayList<Integer> counts = new ArrayList<>();
-                for (int i = 0; i < messageStore.size(); i++) {
-                    Message tmp = messageStore.get(i);
-                    if (tmp.flag == false) {
-                        byte[] decrypt = null;
-                        try {
-                            decrypt = decryptMessage(tmp.encrypt, tmp.id);
-                        } catch (Exception e) {
-                            System.out.println(e.getMessage());
-                        }
-                        int[] dec = FuncConst.split(decrypt);
-                        if (dec[2] == this.seqNumber) {
-                            agregation.add(dec[1]);
-                            mac.add(tmp.mac);
-                            counts.add(dec[0]);
-                        } else {
-                            continue;
-                        }
-                        descendants.add(new int[]{tmp.getId(),tmp.getC()});
+            for (int i = 0; i < messageStore.size(); i++) {
+                Message tmp = messageStore.get(i);
+                if (tmp.flag == false) {
+                    byte[] decrypt = null;
+                    try {
+                        decrypt = decryptMessage(tmp.encrypt, tmp.id);
+                    } catch (Exception e) {
+                        System.out.println(e.getMessage());
                     }
-                }
-                int c = sum(counts);
-                C = c;
-                Message mes;
-                agregation.add(this.physicalPhenomenon);
-                agr = sum(agregation)/agregation.size();
-                attestateMac = xorMac(mac);
-                if(FuncConst.FunctionH(this.seqNumber,this.id) < FuncConst.FunctionG(c)) {
-                    mes = new Message(id, c,getEncrypt(c,agr,this.seqNumber,true),getByteMac(1,c,agr,xorMac(mac),this.seqNumber,true),true,this.idParants);//если лидер
-                }
-                else {
-                    if (idParants == 0) {
-                         mes = new Message(id, c, getEncrypt(c, agr, this.seqNumber, true), getByteMac(0, c, agr, xorMac(mac), seqNumber, true), false, idParants);//если не лидер
+                    int[] dec = FuncConst.split(decrypt);
+                    if (dec[2] == this.seqNumber) {
+                        agregation.add(dec[1]);
+                        mac.add(tmp.mac);
+                        counts.add(dec[0]);
                     } else {
-                        mes = new Message(id, c, getEncrypt(c, agr, this.seqNumber, false), getByteMac(0, c, agr, xorMac(mac), seqNumber, true), false, idParants);//если не лидер
+                        continue;
                     }
+                    descendants.add(new int[]{tmp.getId(), tmp.getC()});
                 }
-                return mes;
             }
-        return  null;
+            int c = sum(counts);
+            C = c;
+            Message mes;
+            agregation.add(this.physicalPhenomenon);
+            agr = sum(agregation) / agregation.size();
+            attestateMac = xorMac(mac);
+            if (FuncConst.FunctionH(this.seqNumber, this.id) < FuncConst.FunctionG(c)) {
+                mes = new Message(id, c, getEncrypt(c, agr, this.seqNumber, true), getByteMac(1, c, agr, xorMac(mac), this.seqNumber, true), true, this.idParants);//если лидер
+            } else {
+                if (idParants == 0) {
+                    mes = new Message(id, c, getEncrypt(c, agr, this.seqNumber, true), getByteMac(0, c, agr, xorMac(mac), seqNumber, true), false, idParants);//если не лидер
+                } else {
+                    mes = new Message(id, c, getEncrypt(c, agr, this.seqNumber, false), getByteMac(0, c, agr, xorMac(mac), seqNumber, true), false, idParants);//если не лидер
+                }
+            }
+            this.message = mes;
+            return mes;
+        }
+        else
+        {
+            Message mes = new Message(this.id, 1, getEncrypt(1,this.physicalPhenomenon,seqNumber,false), getByteMac(0,1,this.physicalPhenomenon,null,this.seqNumber,false), false, idParants);
+            this.message = mes;
+            return mes;
+        }
     }
     private ArrayList<Message> getForwardingMessage()
     {
