@@ -1,3 +1,4 @@
+
 import javax.crypto.SecretKey;
 import java.util.ArrayList;
 
@@ -82,6 +83,18 @@ public class WSN {
                 }
                 listMessage.add(end);
             }
+            for(int j = 0; j < listMessage.get(listMessage.size() - 1).size();j++)
+            {
+                bs.setMessage(listMessage.get(listMessage.size()-1).get(j));
+            }
+            ArrayList<int[]>decryptMesBS = bs.getAllMessage();
+            ArrayList<int[]>decryptMesBScopy = new ArrayList<>(decryptMesBS);
+            ArrayList<Integer> attestatelist = bs.grubbsTest(decryptMesBScopy);
+            for(int j = 0;j < attestatelist.size();j++)
+            {
+
+            }
+
 
         }
 

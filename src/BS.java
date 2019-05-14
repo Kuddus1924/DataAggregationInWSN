@@ -1,3 +1,5 @@
+import org.apache.commons.lang3.tuple.Pair;
+
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
@@ -89,12 +91,30 @@ private Random random = new Random();
         int[] dec = FuncConst.split(decrypt);
         return dec;
     }
+    public ArrayList<int[]> getAllMessage()
+    {
+        ArrayList<int[]>result = new ArrayList<>();
+        for(int i = 0; i < messageStore.size(); i++)
+        {
+            if (checkMessage(messageStore.get(i)))
+            {
+                int[] res = new int[4];
+                res[0] = messageStore.get(i).getId();
+                int[] dec = decryptMessage(messageStore.get(i));
+                res[1] = dec[0];
+                res[2] = dec[1];
+                res[3] = dec[2];
+                result.add(res);
+            }
+        }
+        return result;
+    }
 
     public  int generateSq() {
         sq = random.nextInt();
         return sq;
     }
-    public ArrayList<Integer>  grubbsTest(ArrayList<int[]> tuples)
+    public ArrayList<Integer> grubbsTest(ArrayList<int[]> tuples)
     {
         ArrayList<Integer> result = new ArrayList<>();
         while (true) {
@@ -145,4 +165,5 @@ private Random random = new Random();
         }
         return result;
     }
+
 }
