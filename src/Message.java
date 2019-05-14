@@ -28,6 +28,11 @@ public class Message {
     public int getGroupLeaderId() {
         return groupLeaderId;
     }
+
+    public int getRecipient() {
+        return recipient;
+    }
+
     public byte[] getEncrypt() {
         return encrypt;
     }

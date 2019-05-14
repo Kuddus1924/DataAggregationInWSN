@@ -20,7 +20,7 @@ public class Node {
     private ArrayList<int[]> shippingTable = new ArrayList<>();
     private SecretKey keyPair;
     private SecretKey[] keyBS;
-    private boolean isNotEndNode = false;
+    private boolean isNotEndNode;
     private String algo = "HMACMD5";
     private int idParants;
     private byte[] attestateMac;
@@ -38,9 +38,9 @@ public class Node {
         idParants = idP;
     }
 
-    public void setMessage(Message mes) {
+    /*public void setMessage(Message mes) {
         messageStore.add(mes);
-    }
+    }*/
 
     public int getIdParants() {
         return idParants;
@@ -181,14 +181,18 @@ public class Node {
             this.message = mes;
             return mes;
         }
-        else
-        {
-            Message mes = new Message(this.id, 1, getEncrypt(1,this.physicalPhenomenon,seqNumber,false), getByteMac(0,1,this.physicalPhenomenon,null,this.seqNumber,false), false, idParants);
+        else {
+            Message mes = new Message(this.id, 1, getEncrypt(1, this.physicalPhenomenon, seqNumber, false), getByteMac(0, 1, this.physicalPhenomenon, null, this.seqNumber, false), false, idParants);
             this.message = mes;
             return mes;
         }
     }
-    private ArrayList<Message> getForwardingMessage()
+
+    public boolean isNotEndNode() {
+        return isNotEndNode;
+    }
+
+    public ArrayList<Message> getForwardingMessage()
     {
         ArrayList <Message>result = new ArrayList();
         for(int i = 0;i < messageStore.size();i++)

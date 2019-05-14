@@ -44,17 +44,45 @@ public class WSN {
         {
             ArrayList<Message> end = new ArrayList<>();
             int sq = bs.generateSq();
-            for(int j = 0;j < levels.get(levels.size()-1).size();j++)
+            /*for(int j = 0;j < levels.get(levels.size()-1).size();j++)
             {
-                end.add(levels.get(levels.size()-1).get(j).getMessageParants(sq))
+                end.add(levels.get(levels.size()-1).get(j).getMessageParants(sq));
             }
-            for(int j = levels.size() - 2; j >= 0;j--)
+            listMessage.add(end);*/
+            for(int j = levels.size() - 1; j >= 0;j--)
             {
+                end = new ArrayList<>();
                 for(int k = 0;k < levels.get(j).size();k++)
                 {
-
+                    if(levels.get(j).get(k).isNotEndNode())
+                    {
+                        ArrayList<Message> messageArrayList = listMessage.get(listMessage.size() - 1);
+                        for(int z = 0; z < messageArrayList.size(); z++)
+                        {
+                            Message tmpMes = messageArrayList.get(z);
+                            if(tmpMes.getRecipient() == levels.get(j).get(k).getId())
+                            {
+                                levels.get(j).get(k).setMessageStore(tmpMes);
+                            }
+                        }
+                        Message mes = levels.get(j).get(k).getMessageParants(sq);
+                        ArrayList<Message> forwarding = levels.get(j).get(k).getForwardingMessage();
+                        if(forwarding.size() != 0)
+                        {
+                            for(int y = 0; y < forwarding.size(); y++)
+                            {
+                                end.add(forwarding.get(y));
+                            }
+                        }
+                        end.add(mes);
+                    }
+                    else{
+                        end.add(levels.get(j).get(k).getMessageParants(sq));
+                    }
                 }
+                listMessage.add(end);
             }
+
         }
 
     }
