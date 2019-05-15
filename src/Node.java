@@ -12,7 +12,7 @@ import java.util.Map;
 
 public class Node {
     private int id;
-    private int physicalPhenomenon;
+    private int physicalPhenomenon = 67;
     private int seqNumber;
     private HashMap<Integer, SecretKey> keyStore = new HashMap<>();
     private ArrayList<Message> messageStore = new ArrayList();
