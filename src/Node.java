@@ -29,7 +29,15 @@ public class Node {
     private int agr = 0;
     private int C = 0;
 
+    public void clean()
+    {
+        messageStore = new ArrayList();
+         descendants = new ArrayList<>();
+         shippingTable = new ArrayList<>();
+        int agr = 0;
+        int C = 0;
 
+    }
     public Node(int id, int idP) {
         this.id = id;
         isNotEndNode = false;

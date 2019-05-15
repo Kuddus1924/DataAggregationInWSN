@@ -18,6 +18,10 @@ private int sa;
 private Random random = new Random();
     public void BS(){
     }
+    public void clean()
+    {
+        messageStore =  new ArrayList<>();
+    }
     public void setMessage(Message tmp)
     {
         if(tmp.recipient == 0)

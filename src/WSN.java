@@ -6,10 +6,11 @@ import java.util.HashMap;
 
 public class WSN {
     ArrayList<ArrayList<Node>> levels = new ArrayList<>();
+    BS bs;
 
     public void workinWSN(int quantityRequests) {
         ArrayList<ArrayList<Integer>> connections = ReadNetwork.read("WSN.txt");
-        BS bs = new BS();
+        bs = new BS();
         int count = 1;
         int cnt = 1;
         ArrayList<Node> tmp = new ArrayList<>();
@@ -136,7 +137,7 @@ public class WSN {
 
             }
             System.out.println("aggregation result: "  + sum(decryptMesBS));
-            ///очитска данных;
+            clean();
 
         }
     }
@@ -162,7 +163,16 @@ public class WSN {
         sum /= list.size();
         return sum;
     }
-
-
+    public void clean()
+    {
+        bs.clean();
+        for(int j = 0; j < levels.size(); j++ )
+        {
+            for(int z = 0; z < levels.size(); z++ )
+            {
+                levels.get(j).get(z).clean();
+            }
+        }
+    }
 
 }
