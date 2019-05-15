@@ -184,6 +184,7 @@ public class Node {
         else {
             Message mes = new Message(this.id, 1, getEncrypt(1, this.physicalPhenomenon, seqNumber, false), getByteMac(0, 1, this.physicalPhenomenon, null, this.seqNumber, false), false, idParants);
             this.message = mes;
+            this.attestateMac = getByteMac(0, 1, this.physicalPhenomenon, null, this.seqNumber, false);
             return mes;
         }
     }
@@ -283,16 +284,33 @@ public class Node {
         }
         return result;
     }
+    public int sumC(int count)
+    {
+        int result = 0;
+        for(int i = 0; i < count;i++)
+        {
+            result += descendants.get(i)[1];
+        }
+        return result;
+    }
     public int descendantsSize()
     {
         return descendants.size();
     }
-    public Message attestateMes(boolean flag,int sa)
+    public int getDesId(int pos)
+    {
+        return descendants.get(pos)[0];
+    }
+
+    public ArrayList<int[]> getDescendants() {
+        return descendants;
+    }
+    public Message attestateMes(boolean flag, int sa)
     {
         if(flag)
-            return new Message(id,0,getEncryptA(id,C,physicalPhenomenon,sa,true),null,false,0);
+            return new Message(id,0,getEncryptA(id,C,physicalPhenomenon,sa,true),null,false,this.idParants);
         else
-            return new Message(id,0,getEncryptAmac(id,C,physicalPhenomenon,sa,attestateMac,true),null,false,0);
+            return new Message(id,0,getEncryptA(id,C,agr,sa,true),attestateMac,false,idParants);
     }
     private byte[] getEncryptA(int id, int ca, int r,int ss,boolean bs)
     {
@@ -321,8 +339,8 @@ public class Node {
         byte[] mes = ArrayUtils.addAll(c, pp);
         byte[] encrypt = null;
         mes = ArrayUtils.addAll(mes, sq);
-        mes = ArrayUtils.addAll(mes, mac);
         mes = ArrayUtils.addAll(mes, sa);
+        mes = ArrayUtils.addAll(mes, mac);
         try {
             encrypt = generateEncryptMessage(mes,bs);
         } catch (Exception e) {

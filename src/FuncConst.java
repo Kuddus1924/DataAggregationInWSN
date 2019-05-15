@@ -1,4 +1,5 @@
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
 
@@ -25,6 +26,36 @@ public class FuncConst {
         wrapped = ByteBuffer.wrap(sq);
         result[2] =wrapped.getInt();
         return result;
+    }
+    public static int[] split4(byte[] mas)
+    {
+        byte[] c = Arrays.copyOfRange(mas, 0, 3);
+        byte[] pp = Arrays.copyOfRange(mas, 4, 7);
+        byte[] sq = Arrays.copyOfRange(mas, 8, 11);
+        byte[] sa = Arrays.copyOfRange(mas, 11, 15);
+        int[] result = new int[3];
+        ByteBuffer wrapped = ByteBuffer.wrap(c);
+        result[0] =wrapped.getInt();
+        wrapped = ByteBuffer.wrap(pp);
+        result[1] =wrapped.getInt();
+        wrapped = ByteBuffer.wrap(sq);
+        result[2] =wrapped.getInt();
+        wrapped = ByteBuffer.wrap(sa);
+        result[3] =wrapped.getInt();
+        return result;
+    }
+    public static byte[] xorMac(byte[] tmp,byte[] tmp2)
+    {
+        if(tmp == null)
+        {
+            return tmp2;
+        }
+            byte[] xor = new byte[tmp.length];
+            for(int j = 0;j < tmp.length; j++)
+            {
+                xor[j] = (byte)(tmp[j]^tmp2[j]);
+            }
+        return xor;
     }
 
 

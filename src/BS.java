@@ -10,9 +10,11 @@ import java.util.Random;
 
 public class BS {
 private ArrayList<Message> messageStore = new ArrayList<>();
+private ArrayList<byte[]> attestationMac = new ArrayList<>();
 private HashMap<Integer,SecretKey> keyStoreMAC = new HashMap<>();
 private  HashMap<Integer,SecretKey> keyStoreEnc = new HashMap<>();
 private int sq;
+private int sa;
 private Random random = new Random();
     public void BS(){
     }
@@ -165,5 +167,38 @@ private Random random = new Random();
         }
         return result;
     }
+    public  int getSa()
+    {
+        sa = random.nextInt();
+        return sa;
+    }
+    public int[] decryptA(Message message)
+    {
+        try {
+            if (message.encrypt.length == 16) {
+                byte[] mes = decryptMessage(message.encrypt, message.id);
+                return FuncConst.split4(mes);
+            }
+            else
+            {
+                attestationMac.add(message.mac);
+                byte[] mes = decryptMessage(message.encrypt, message.id);
+                return FuncConst.split4(mes);
+            }
+        }
+        catch (Exception e)
+        {
+            System.out.println(e.getMessage());
+        }
+        return null;
+    }
+    public byte[] getMac(int index)
+    {
+        return messageStore.get(index).mac;
+    }
+
+
+
+
 
 }
