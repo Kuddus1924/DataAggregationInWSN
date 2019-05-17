@@ -3,6 +3,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
+import javax.crypto.spec.IvParameterSpec;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,7 +16,8 @@ private HashMap<Integer,SecretKey> keyStoreMAC = new HashMap<>();
 private  HashMap<Integer,SecretKey> keyStoreEnc = new HashMap<>();
 private int sq;
 private int sa;
-private Random random = new Random();
+private  IvParameterSpec iv;
+    private Random random = new Random();
     public void BS(){
     }
     public void clean()
@@ -84,13 +86,13 @@ private Random random = new Random();
     public byte[] decryptMessage(byte[] message, int idDescendant) throws Exception {
         Cipher cipher = Cipher.getInstance("AES/CTR/NoPadding");
         SecretKey key = keyStoreEnc.get(idDescendant);
-        cipher.init(Cipher.DECRYPT_MODE, key);
+        cipher.init(Cipher.DECRYPT_MODE, key,iv);
         return cipher.doFinal(message);
     }
     public int[] decryptMessage(Message tmp) {
         byte[] decrypt = null;
         try {
-            decrypt = decryptMessage(tmp.encrypt,tmp.getGroupLeaderId());
+            decrypt = decryptMessage(tmp.encrypt,tmp.getId());
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
@@ -117,12 +119,13 @@ private Random random = new Random();
     }
 
     public  int generateSq() {
-        sq = random.nextInt();
+        sq = random.nextInt()%100;
         return sq;
     }
     public ArrayList<Integer> grubbsTest(ArrayList<int[]> tuples)
     {
-        ArrayList<Integer> result = new ArrayList<>();
+        return new ArrayList<>();
+        /*ArrayList<Integer> result = new ArrayList<>();
         while (true) {
             double uc = 0;
             double sc = 0;
@@ -161,6 +164,10 @@ private Random random = new Random();
             double pu = 0;//уточнить
             if((pu * pc) < 0.05)
             {
+                if (tuples.size() == 0)
+                {
+                    break;
+                }
                 tuples.remove(number);
                 result.add(id);
             }
@@ -169,7 +176,7 @@ private Random random = new Random();
                 break;
             }
         }
-        return result;
+        return result;*/
     }
     public  int getSa()
     {
@@ -200,7 +207,10 @@ private Random random = new Random();
     {
         return messageStore.get(index).mac;
     }
-
+    public void setIv(IvParameterSpec i)
+    {
+        iv = i;
+    }
 
 
 

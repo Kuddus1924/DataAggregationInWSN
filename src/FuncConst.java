@@ -15,9 +15,9 @@ public class FuncConst {
     }
     public static int[] split(byte[] mas)
     {
-        byte[] c = Arrays.copyOfRange(mas, 0, 3);
-        byte[] pp = Arrays.copyOfRange(mas, 4, 7);
-        byte[] sq = Arrays.copyOfRange(mas, 8, 11);
+        byte[] c = Arrays.copyOfRange(mas, 0, 4);
+        byte[] pp = Arrays.copyOfRange(mas, 4, 8);
+        byte[] sq = Arrays.copyOfRange(mas, 8, 12);
         int[] result = new int[3];
         ByteBuffer wrapped = ByteBuffer.wrap(c);
         result[0] =wrapped.getInt();

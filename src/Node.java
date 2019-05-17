@@ -4,14 +4,18 @@ import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.Mac;
 import javax.crypto.SecretKey;
+import javax.crypto.spec.IvParameterSpec;
 import java.nio.ByteBuffer;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+
 import java.util.Map;
 
 public class Node {
     private int id;
+    static final IvParameterSpec iv = new IvParameterSpec(new SecureRandom().generateSeed(16));
     private int physicalPhenomenon = 67;
     private int seqNumber;
     private HashMap<Integer, SecretKey> keyStore = new HashMap<>();
@@ -19,12 +23,12 @@ public class Node {
     private ArrayList<int[]> descendants = new ArrayList<>();
     private ArrayList<int[]> shippingTable = new ArrayList<>();
     private SecretKey keyPair;
-    private SecretKey[] keyBS;
+    private SecretKey[] keyBS  = new SecretKey[2];
     private boolean isNotEndNode;
     private String algo = "HMACMD5";
     private int idParants;
     private byte[] attestateMac;
-    private KeyGenerator gen;
+    private KeyGenerator gen ;
     private Message message;
     private int agr = 0;
     private int C = 0;
@@ -41,7 +45,7 @@ public class Node {
     public Node(int id, int idP) {
         this.id = id;
         isNotEndNode = false;
-        physicalPhenomenon = 0;
+        physicalPhenomenon = 67;
         seqNumber = 0;
         idParants = idP;
     }
@@ -75,7 +79,7 @@ public class Node {
         this.isNotEndNode = agregator;
         if(agregator) {
             try {
-                gen = KeyGenerator.getInstance(algo);
+                gen = KeyGenerator.getInstance("AES");
             } catch (Exception e) {
                 System.out.println(e.getMessage());
             }
@@ -132,17 +136,18 @@ public class Node {
     public byte[] generateEncryptMessage(byte[] message, boolean bs) throws Exception {
         Cipher cipher = Cipher.getInstance("AES/CTR/NoPadding");
         if(bs)
-        cipher.init(Cipher.ENCRYPT_MODE, keyBS[0]);
+        cipher.init(Cipher.ENCRYPT_MODE, keyBS[0],iv);
         else
-        cipher.init(Cipher.ENCRYPT_MODE, keyPair);
+        cipher.init(Cipher.ENCRYPT_MODE, keyPair, iv);
         return cipher.doFinal(message);
     }
 
     public byte[] decryptMessage(byte[] message, int idDescendant) throws Exception {
         Cipher cipher = Cipher.getInstance("AES/CTR/NoPadding");
         SecretKey key = keyStore.get(idDescendant);
-        cipher.init(Cipher.DECRYPT_MODE, key);
-        return cipher.doFinal(message);
+        cipher.init(Cipher.DECRYPT_MODE, key,iv);
+        byte[] result = cipher.doFinal(message);
+        return result;
     }
 
     public Message getMessageParants(int count) {
@@ -356,5 +361,9 @@ public class Node {
             return null;
         }
         return encrypt;
+    }
+
+    public  IvParameterSpec getIv() {
+        return iv;
     }
 }

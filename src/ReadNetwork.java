@@ -15,6 +15,10 @@ public class ReadNetwork {
             {
                     tmp = new ArrayList<>();
                     mas = str.split(" ");
+                    if(Integer.parseInt(mas[0]) == -1)
+                    {
+                        continue;
+                    }
                     for(int i = 0; i < mas.length; i++)
                     {
                         tmp.add(Integer.parseInt(mas[i]));

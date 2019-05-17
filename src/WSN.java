@@ -74,6 +74,7 @@ public class WSN {
             for (int j = 0; j < listMessage.get(listMessage.size() - 1).size(); j++) {
                 bs.setMessage(listMessage.get(listMessage.size() - 1).get(j));
             }
+            bs.setIv(getNode(1).getIv());
             ArrayList<int[]> decryptMesBS = bs.getAllMessage();
             ArrayList<int[]> decryptMesBScopy = new ArrayList<>(decryptMesBS);
             ArrayList<Integer> attestatelist = bs.grubbsTest(decryptMesBScopy);
@@ -174,5 +175,11 @@ public class WSN {
             }
         }
     }
+    public static void main(String[] arg)
+    {
+        WSN wsn = new WSN();
+        wsn.workinWSN(2);
+    }
+
 
 }
