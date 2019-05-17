@@ -124,8 +124,8 @@ private  IvParameterSpec iv;
     }
     public ArrayList<Integer> grubbsTest(ArrayList<int[]> tuples)
     {
-        return new ArrayList<>();
-        /*ArrayList<Integer> result = new ArrayList<>();
+
+        ArrayList<Integer> result = new ArrayList<>();
         while (true) {
             double uc = 0;
             double sc = 0;
@@ -141,8 +141,8 @@ private  IvParameterSpec iv;
                 sc += Math.pow(tuples.get(i)[1]- uc,2);
                 su += Math.pow(tuples.get(i)[2]- uc,2);
             }
-            sc /= tuples.size();
-            su /= tuples.size();
+            sc /= tuples.size() - 1;
+            su /= tuples.size() - 1;
             sc = Math.sqrt(sc);
             su = Math.sqrt(su);
             int max = 0;
@@ -176,7 +176,7 @@ private  IvParameterSpec iv;
                 break;
             }
         }
-        return result;*/
+        return result;
     }
     public  int getSa()
     {
