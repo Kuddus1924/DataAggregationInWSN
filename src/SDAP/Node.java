@@ -1,3 +1,6 @@
+package SDAP;
+
+import SDAP.FuncConst;
 import org.apache.commons.lang3.ArrayUtils;
 
 import javax.crypto.Cipher;
@@ -10,8 +13,6 @@ import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-
-import java.util.Map;
 
 public class Node {
     private int id;

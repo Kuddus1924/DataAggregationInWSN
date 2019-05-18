@@ -1,8 +1,12 @@
 
-import javax.crypto.SecretKey;
+import SDAP.BS;
+import SDAP.FuncConst;
+import SDAP.Message;
+import SDAP.Node;
+import general.function.ReadNetwork;
+
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 
 public class WSN {
     ArrayList<ArrayList<Node>> levels = new ArrayList<>();
@@ -41,11 +45,6 @@ public class WSN {
         for (int i = 0; i < quantityRequests; i++) {
             ArrayList<Message> end = new ArrayList<>();
             int sq = bs.generateSq();
-            /*for(int j = 0;j < levels.get(levels.size()-1).size();j++)
-            {
-                end.add(levels.get(levels.size()-1).get(j).getMessageParants(sq));
-            }
-            listMessage.add(end);*/
             for (int j = levels.size() - 1; j >= 0; j--) {
                 end = new ArrayList<>();
                 for (int k = 0; k < levels.get(j).size(); k++) {

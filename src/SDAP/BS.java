@@ -1,3 +1,5 @@
+package SDAP;
+
 import org.apache.commons.lang3.tuple.Pair;
 
 import javax.crypto.Cipher;
@@ -124,7 +126,7 @@ private  IvParameterSpec iv;
     }
     public ArrayList<Integer> grubbsTest(ArrayList<int[]> tuples)
     {
-
+        int n = tuples.size();
         ArrayList<Integer> result = new ArrayList<>();
         while (true) {
             double uc = 0;
@@ -159,10 +161,8 @@ private  IvParameterSpec iv;
                 }
             }
             double Zc =(max - uc)/sc;
-            double pc = 0;//уточнить
             double Zu = Math.abs(agr - uu)/su;
-            double pu = 0;//уточнить
-            if((pu * pc) < 0.05)
+            if((Zc * Zu) < FuncConst.getGrabbsCriterion(n))
             {
                 if (tuples.size() == 0)
                 {
