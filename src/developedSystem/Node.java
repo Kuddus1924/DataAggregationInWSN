@@ -8,7 +8,7 @@ import java.util.Random;
 
 public class Node {
     private int id;
-    private boolean aggregator;
+    private int aggregator;
     private int key;
     private int physicalPhenomenon;
     private int numberReq;
@@ -41,14 +41,49 @@ public class Node {
     {
         if(numberGr == new Random(numberReq).nextInt(sizeGr))
             return true;
-        else
+        else {
+            aggregator = new Random(numberReq).nextInt(sizeGr);
             return false;
+        }
     }
     private  void setMessages(Message message)
     {
         if(amIanAggregator())
             messages.add(message);
     }
+    private byte[] getActive()
+    {
+        return ByteBuffer.allocate(4).putInt((int)Math.pow(2,numberGr)).array();
+    }
+    private Message sendMessage()
+    {
+        if(amIanAggregator())
+        {
+            byte[] enctypt = encryptMessage();
+            byte[] active = new byte[4];
+            for(int i = 0;i < messages.size();i++)
+            {
+                enctypt = xor(enctypt,messages.get(i).getMessage());
+                active = xor(active,messages.get(i).getActiveNodes());
+            }
+            return new Message(this.id,active,enctypt,-1);
+        }
+        else
+        {
+            return new Message(this.id,getActive(),encryptMessage(),aggregator);
+        }
+    }
+    private byte[] xor(byte[] mas1,byte[] mas2)
+    {
+            byte[] xor = new byte[4];
+            for(int j = 0;j < mas1.length; j++)
+            {
+                xor[j] = (byte)(mas1[j]^mas2[j]);
+            }
+
+        return xor;
+    }
+
 
 
 
