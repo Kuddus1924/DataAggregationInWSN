@@ -1,26 +1,34 @@
 package developedSystem;
 
+import java.math.BigInteger;
+
 public class Message {
      public byte[] activeNodes;
-     public byte[] message;
+     public BigInteger message;
      public int id;
      public int activeMembers;
      public int recipient;
+     private int idgr;
+     private byte[] Mac;
 
-
-    public Message(int id,byte[]active,byte[]mes,int recipient)
+    public Message(int id,byte[]active,BigInteger mes,int recipient, byte[] mac)
     {
         this.id = id;
         activeNodes = active;
         message = mes;
         this.recipient = recipient;
+        Mac = mac;
+    }
+
+    public byte[] getMac() {
+        return Mac;
     }
 
     public byte[] getActiveNodes() {
         return activeNodes;
     }
 
-    public byte[] getMessage() {
+    public BigInteger getMessage() {
         return message;
     }
 }

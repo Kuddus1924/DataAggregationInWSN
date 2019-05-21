@@ -1,8 +1,5 @@
+package SDAP;
 
-import SDAP.BS;
-import SDAP.FuncConst;
-import SDAP.Message;
-import SDAP.Node;
 import general.function.ReadNetwork;
 
 import java.util.ArrayList;

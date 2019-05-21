@@ -110,7 +110,7 @@ public class Node {
         }
     }
 
-    public boolean checkMAC(byte[] macNode, int idNode, byte[] message) {
+    /*public boolean checkMAC(byte[] macNode, int idNode, byte[] message) {
         if (isNotEndNode) {
             SecretKey key = keyStore.get(idNode);
             if (key == null) {
@@ -132,7 +132,7 @@ public class Node {
             return false;
         }
         return false;
-    }
+    }*/
 
     public byte[] generateEncryptMessage(byte[] message, boolean bs) throws Exception {
         Cipher cipher = Cipher.getInstance("AES/CTR/NoPadding");
