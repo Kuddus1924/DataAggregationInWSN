@@ -49,16 +49,11 @@ public class Node {
 
 
     }
-    private int getGroupNumber()
-    {
-        return (int)Math.pow(2,numberGr - 1);
-    }
     private boolean amIanAggregator()
     {
-        if(numberGr == new Random(numberReq).nextInt(sizeGr))
+        if(numberGr == aggregator)
             return true;
         else {
-            aggregator = new Random(numberReq).nextInt(sizeGr);
             return false;
         }
     }
@@ -79,15 +74,16 @@ public class Node {
             byte[] active = new byte[4];
             for(int i = 0;i < messages.size();i++)
             {
-                if()
-                enctypt = enctypt.multiply(messages.get(i).getMessage().mod(new BigInteger(Integer.toString(key*key))));
-                active = xor(active,messages.get(i).getActiveNodes());
+                if(checkMessage(messages.get(i))) {
+                    enctypt = enctypt.multiply(messages.get(i).getMessage().mod(new BigInteger(Integer.toString(key * key))));
+                    active = xor(active, messages.get(i).getActiveNodes());
+                }
             }
-            return new Message(this.id,active,enctypt,-1,getMAC(createMac(this.id,encryptMessage())));
+            return new Message(this.id,active,enctypt,-1,getMAC(createMac(this.id,encryptMessage(),numberReq)));
         }
         else
         {
-            return new Message(this.id,getActive(),encryptMessage(),aggregator,getMAC(createMac(this.id,encryptMessage())));
+            return new Message(this.id,getActive(),encryptMessage(),aggregator,getMAC(createMac(this.id,encryptMessage(),numberReq)));
         }
     }
     private byte[] xor(byte[] mas1,byte[] mas2)
@@ -124,11 +120,13 @@ public class Node {
         }
         return false;
     }
-    public byte[] createMac(int id, BigInteger x)
+    public byte[] createMac(int id, BigInteger x,int numberReq)
     {
         byte[] ids = ByteBuffer.allocate(4).putInt(id).array();
         byte[] xmac =  x.toByteArray();
+        byte[] sq = ByteBuffer.allocate(4).putInt(numberReq).array();
         byte[] toMac = ArrayUtils.addAll(ids, xmac);
+        toMac = ArrayUtils.addAll(toMac, sq);
         return toMac;
     }
     private boolean checkMessage(Message mes) {
@@ -140,7 +138,7 @@ public class Node {
         }
         if (count == 1)
         {
-            if(checkMAC(mes.getMac(),createMac(mes.id,mes.message)))
+            if(checkMAC(mes.getMac(),createMac(mes.id,mes.message,numberReq)))
             {
                 return true;
             }
@@ -150,6 +148,13 @@ public class Node {
         }
         return false;
     }
-
+    public  void  setAggregator(int aggregator)
+    {
+        this.aggregator = aggregator;
+    }
+    public  double generateNumber()
+    {
+        return Math.random();
+    }
 
 }
