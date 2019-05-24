@@ -1,6 +1,7 @@
 package developedSystem;
 import javax.crypto.SecretKey;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Random;
 
 public class Cluster {
@@ -10,6 +11,7 @@ public class Cluster {
     private Random random = new Random();
     private int id;
     private SecretKey key;
+    private HashSet<Integer> badlist = new HashSet<>();
     private ArrayList<Integer> listAggregation = new ArrayList<>();
     public void setNode(Node node)
     {
@@ -18,16 +20,23 @@ public class Cluster {
     public Cluster(int id)
     {
         this.id = id;
-        for(int i = 0; i < 5; i++)
+        for(int i = 0; i < 21; i++)
         {
             listAggregation.add(0);
         }
     }
+    public void setBadlist(ArrayList<Integer> badList)
+    {
+        for(int i = 0;i < badList.size();i++) {
+            this.badlist.add(badList.get(i));
+        }
+    }
     public void setKey(int n, SecretKey k)
     {
+        key = k;
         for(int i = 0; i < nodes.size();i++)
         {
-            nodes.get(i).setKey(n,key);
+            nodes.get(i).setKey(n,k);
         }
     }
     public void setNumberSeq(int numberSeq)
@@ -76,15 +85,39 @@ public class Cluster {
     }
     public boolean checklist(int i)
     {
-        for (int z = listAggregation.size() - 1;z >=  listAggregation.size() - 6; z--)
+        for (int z = listAggregation.size() - 1;z >=  listAggregation.size() - 20; z--)
         {
             if(i == listAggregation.get(z))
             {
                 return false;
             }
         }
+        for(int d = 0; d < badlist.size(); d++)
+        {
+            if(badlist.contains(nodes.get(i).getId()))
+            {
+                return false;
+            }
+        }
         return true;
     }
+    public Message startWorking(Integer sq)
+    {
+        setNumberSeq(sq);
+        int select = selectionAggregation();
+        for(int i = 0; i < nodes.size(); i++)
+        {
+            nodes.get(i).setAggregator(select);
+        }
+        return getMessageGroup();
+    }
+    public Message continueWork(Integer sq)
+    {
+        setNumberSeq(sq);
+        return getMessageGroup();
+    }
+
+
 
 
 

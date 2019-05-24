@@ -31,4 +31,16 @@ public class Message {
     public BigInteger getMessage() {
         return message;
     }
+
+    public void setIdgr(int idgr) {
+        this.idgr = idgr;
+    }
+    public int getId()
+    {
+        return id;
+    }
+
+    public int getIdgr() {
+        return idgr;
+    }
 }

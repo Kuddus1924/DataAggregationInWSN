@@ -14,7 +14,6 @@ import java.util.Random;
 
 public class Node {
     private int id;
-    private boolean badNode;
     private int aggregator;
     private int key;
     private String algo = "HMACMD5";
@@ -31,10 +30,13 @@ public class Node {
         this.sizeGr = gr;
         this.numberGr = numberGr;
     }
-
     public void setKey(int key,SecretKey k) {
         this.key = key;
         keyMac = k;
+    }
+
+    public int getId() {
+        return id;
     }
 
     public void setNumberReq(int numberReq) {
@@ -81,7 +83,9 @@ public class Node {
                     active = xor(active, messages.get(i).getActiveNodes());
                 }
             }
-            return new Message(this.id,active,enctypt,-1,getMAC(createMac(this.id,encryptMessage(),numberReq)));
+            Message result =  new Message(this.id,active,enctypt,-1,getMAC(createMac(this.id,encryptMessage(),numberReq)));
+            result.setIdgr(numberGr);
+            return result;
         }
         else
         {
