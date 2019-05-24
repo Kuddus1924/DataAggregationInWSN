@@ -66,10 +66,26 @@ public class BasicStation {
         return v.intValue() / getParticipants(mes.getActiveNodes(),30);
     }
 
-    /*public ArrayList<Integer> GrubbsTest() {
+    public ArrayList<Integer> GrubbsTest(ArrayList<Integer> value,ArrayList<Integer> idGr) {
+        int n = value.size();
+        ArrayList<Integer> result = new ArrayList<>();
+        double uc = 0;
+        double sc = 0;
+        for (int i = 0; i < value.size(); i++) {
+            uc += value.get(i);
+        }
+        uc /= value.size();
+        for (int i = 0; i < value.size(); i++) {
+            sc += Math.pow(value.get(i) - uc, 2);
+        }
+        sc /= value.size() - 1;
+        sc = Math.sqrt(sc);
 
+       for(int i = 0; i < value.size() ; i++)
+       {
 
-    }*/
+       }
+    }
 
     private int  getParticipants(byte[] mas, int size) {
         int result = 0;
@@ -114,6 +130,22 @@ public class BasicStation {
         toMac = ArrayUtils.addAll(toMac, sq);
         return toMac;
     }
+    public  byte[] findmMax(ArrayList<Integer> list, ArrayList<Integer> ids)
+    {
+        int max = 0;
+        int agr = 0;
+        int id = 0;
+        int number = -1;
+        for (int i = 0; i < list.size(); i++) {
+            if(max <  list.get(i))
+            {
+                max =  list.get(i);
+                id = ids.get(i);
+                number = i;
+            }
+        }
+    }
+
 }
 
 

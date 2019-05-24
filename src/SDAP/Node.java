@@ -1,6 +1,7 @@
 package SDAP;
 
-import SDAP.FuncConst;
+import general.function.FuncConst;
+import general.function.ReadNetwork;
 import org.apache.commons.lang3.ArrayUtils;
 
 import javax.crypto.Cipher;
@@ -11,7 +12,6 @@ import javax.crypto.spec.IvParameterSpec;
 import java.nio.ByteBuffer;
 import java.security.SecureRandom;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 
 public class Node {

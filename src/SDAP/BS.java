@@ -1,6 +1,6 @@
 package SDAP;
 
-import org.apache.commons.lang3.tuple.Pair;
+import general.function.*;
 
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;

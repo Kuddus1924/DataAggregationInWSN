@@ -1,14 +1,14 @@
-package SDAP;
+package general.function;
 
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Random;
-import general.function.*;
 
-public class FuncConst {
-    public static HashMap<Integer,Double> tableGrubs = ReadNetwork.readTable("grubbs.txt");
+import static general.function.ReadNetwork.readTable;
+
+public  class FuncConst {
+    public static HashMap<Integer,Double> tableGrubs = readTable("grubbs.txt");
     public static double FunctionG(int c)
     {
         return Math.pow((1.0 - Math.exp(-1*0.3*c)),5);
@@ -55,16 +55,16 @@ public class FuncConst {
         {
             return tmp2;
         }
-            byte[] xor = new byte[tmp.length];
-            for(int j = 0;j < tmp.length; j++)
-            {
-                xor[j] = (byte)(tmp[j]^tmp2[j]);
-            }
+        byte[] xor = new byte[tmp.length];
+        for(int j = 0;j < tmp.length; j++)
+        {
+            xor[j] = (byte)(tmp[j]^tmp2[j]);
+        }
         return xor;
     }
     public static double getGrabbsCriterion(int n)
     {
-            return tableGrubs.get(n);
+        return tableGrubs.get(n);
     }
 
 

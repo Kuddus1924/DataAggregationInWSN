@@ -66,7 +66,7 @@ public class Cluster {
           {
                 if(checklist(i))
                 {
-                    if(nodes.get(i).generateNumber() < 1/30)
+                    if(nodes.get(i).generateNumber() < (1 - 0.5*(listAggregation.size()% 20)))
                     {
                         return  i;
                     }

@@ -1,8 +1,11 @@
 package general.function;
 
 import java.io.*;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Random;
 
 public class ReadNetwork {
     public static ArrayList<ArrayList<Integer>> read(String nameFile)
@@ -55,6 +58,4 @@ public class ReadNetwork {
         }
         return result;
     }
-
-
 }

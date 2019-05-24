@@ -14,6 +14,7 @@ import java.util.Random;
 
 public class Node {
     private int id;
+    private boolean badNode;
     private int aggregator;
     private int key;
     private String algo = "HMACMD5";
@@ -68,6 +69,7 @@ public class Node {
     }
     public Message sendMessage()
     {
+        physicalPhenomenon = ValueModeling.getValue();
         if(amIanAggregator())
         {
             BigInteger enctypt = encryptMessage();

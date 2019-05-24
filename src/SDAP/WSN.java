@@ -1,5 +1,6 @@
 package SDAP;
 
+import general.function.FuncConst;
 import general.function.ReadNetwork;
 
 import java.util.ArrayList;
@@ -28,6 +29,7 @@ public class WSN {
                 tmp = new ArrayList<>();
             }
         }
+        levels.add(tmp);
         for (int i = 0; i < levels.size() - 1; i++) {
             for (int j = 0; j < levels.get(i).size(); j++) {
                 for (int k = 0; k < levels.get(i + 1).size(); k++) {
