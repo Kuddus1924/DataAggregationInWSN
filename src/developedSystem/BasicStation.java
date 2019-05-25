@@ -14,7 +14,7 @@ import java.util.*;
 public class BasicStation {
     private HashMap<Integer, Cluster> wsn = new HashMap<>();
     private int N;
-    private int d;
+    private int z;
     private ArrayList<ArrayList<Message>> messagePool = new ArrayList<>();
     private ArrayList<ArrayList<Integer>> badPool = new ArrayList<>();
     private HashMap<Integer, SecretKey> poolKey = new HashMap<>();
@@ -26,15 +26,21 @@ public class BasicStation {
     }
 
     public int getKeyGroup() {
-        int p = 53;
-        int q = 61;
+        int p = 13;
+        int q = 29;
         N = (2 * p + 1) * (2 * q + 1);
-        d = 4 * p * q;
+       int  d = 4 * p * q;
         int count = 1;
-        while (d % N == 1) {
-            d = d * count;
+        while (z % N != 1) {
+            z = d * count;
             count++;
         }
+        /*d =  new BigInteger(Integer.toString(4 * p * q));
+        int count = 1;
+        while (d.mod(new BigInteger(Integer.toString(N))) != BigInteger.ONE) {
+            d = d.multiply(new BigInteger(Integer.toString(count)));
+            count++;
+        }*/
         return N;
     }
 
@@ -62,7 +68,7 @@ public class BasicStation {
 
     private int encrypt(Message mes) {
         BigInteger enc = mes.message;
-        BigInteger v = enc.pow(d).subtract(BigInteger.ONE).mod(new BigInteger(Integer.toString(N * N))).divide(new BigInteger(Integer.toString(N)));
+        BigInteger v = enc.pow(z).subtract(BigInteger.ONE).mod(new BigInteger(Integer.toString(N * N))).divide(new BigInteger(Integer.toString(N)));
         return v.intValue() / getParticipants(mes.getActiveNodes(), 30);
     }
 

@@ -49,7 +49,6 @@ public class Cluster {
     }
     public Message getMessageGroup()
     {
-        idLeader = new Random(seed).nextInt(nodes.size());
         for(int i = 0;i < nodes.size(); i++)
         {
             if(i != idLeader)
@@ -61,8 +60,8 @@ public class Cluster {
     }
     public void createNodes(int start,int end,int key,SecretKey k)
     {
-        int count = 1;
-        for (int i = start; i <= end;i++)
+        int count = 0;
+        for (int i = start + 1; i <= end;i++)
         {
             nodes.add(new Node(i,count,id));
             count++;
@@ -77,6 +76,7 @@ public class Cluster {
                 {
                     if(nodes.get(i).generateNumber() < (1 - 0.5*(listAggregation.size()% 20)))
                     {
+                        idLeader = i;
                         return  i;
                     }
                 }

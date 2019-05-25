@@ -20,14 +20,15 @@ public class Node {
     private SecretKey keyMac;
     private int physicalPhenomenon;
     private int numberReq;
-    private int sizeGr;
+    private int myNumber;
+    private BigInteger test;
     private int mod;
     private int numberGr;
     private ArrayList<Message> messages = new ArrayList();
     public Node(int id, int gr, int numberGr)
     {
         this.id = id;
-        this.sizeGr = gr;
+        this.myNumber = gr;
         this.numberGr = numberGr;
     }
     public void setKey(int key,SecretKey k) {
@@ -54,7 +55,7 @@ public class Node {
     }
     private boolean amIanAggregator()
     {
-        if(numberGr == aggregator)
+        if(myNumber == aggregator)
             return true;
         else {
             return false;
@@ -67,11 +68,12 @@ public class Node {
     }
     private byte[] getActive()
     {
-        return ByteBuffer.allocate(4).putInt((int)Math.pow(2,numberGr)).array();
+        return ByteBuffer.allocate(4).putInt((int)Math.pow(2,myNumber)).array();
     }
     public Message sendMessage()
     {
         physicalPhenomenon = ValueModeling.getValue();
+        System.out.println(physicalPhenomenon);
         if(amIanAggregator())
         {
             BigInteger enctypt = encryptMessage();
@@ -79,17 +81,18 @@ public class Node {
             for(int i = 0;i < messages.size();i++)
             {
                 if(checkMessage(messages.get(i))) {
-                    enctypt = enctypt.multiply(messages.get(i).getMessage().mod(new BigInteger(Integer.toString(key * key))));
+                    enctypt = enctypt.multiply(messages.get(i).getMessage()).mod(new BigInteger(Integer.toString(key * key)));
                     active = xor(active, messages.get(i).getActiveNodes());
                 }
             }
-            Message result =  new Message(this.id,active,enctypt,-1,getMAC(createMac(this.id,encryptMessage(),numberReq)));
+            Message result =  new Message(this.id,active,enctypt,-1,getMAC(createMac(this.id,enctypt,numberReq)));
             result.setIdgr(numberGr);
             return result;
         }
         else
         {
-            return new Message(this.id,getActive(),encryptMessage(),aggregator,getMAC(createMac(this.id,encryptMessage(),numberReq)));
+            test = encryptMessage();
+            return new Message(this.id,getActive(),test,aggregator,getMAC(createMac(this.id,test,numberReq)));
         }
     }
     private byte[] xor(byte[] mas1,byte[] mas2)
@@ -117,7 +120,8 @@ public class Node {
         try {
             Mac mac = Mac.getInstance(algo);
             mac.init(keyMac);
-            if (Arrays.equals(macNode, mac.doFinal(message)))
+            byte [] finals = mac.doFinal(message);
+            if (Arrays.equals(macNode,finals))
                 return true;
             else
                 return false;

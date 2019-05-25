@@ -8,7 +8,7 @@ import java.util.Random;
 import static general.function.ReadNetwork.readTable;
 
 public  class FuncConst {
-    public static HashMap<Integer,Double> tableGrubs = readTable("grubbs.txt");
+    public  HashMap<Integer,Double> tableGrubs = readTable("C:\\Users\\kuddu\\Desktop\\Диплом\\grubbs.txt");
     public static double FunctionG(int c)
     {
         return Math.pow((1.0 - Math.exp(-1*0.3*c)),5);
@@ -64,6 +64,7 @@ public  class FuncConst {
     }
     public static double getGrabbsCriterion(int n)
     {
+        HashMap<Integer,Double> tableGrubs = readTable("C:\\Users\\kuddu\\Desktop\\Диплом\\grubbs.txt");
         return tableGrubs.get(n);
     }
 
