@@ -104,10 +104,22 @@ private  IvParameterSpec iv;
     public ArrayList<int[]> getAllMessage()
     {
         ArrayList<int[]>result = new ArrayList<>();
+        int[] resultAGGR = new int[4];
+        resultAGGR[0] = 0;
+        int count = 0;
         for(int i = 0; i < messageStore.size(); i++)
         {
             if (checkMessage(messageStore.get(i)))
             {
+                if(messageStore.get(i).getGroupLeaderId() == 0)
+                {
+                    int[] dec = decryptMessage(messageStore.get(i));
+                    resultAGGR[1] += dec[0];
+                    resultAGGR[2] += dec[1];
+                    resultAGGR[3] = dec[2];
+                    count++;
+                    continue;
+                }
                 int[] res = new int[4];
                 res[0] = messageStore.get(i).getId();
                 int[] dec = decryptMessage(messageStore.get(i));
@@ -116,6 +128,10 @@ private  IvParameterSpec iv;
                 res[3] = dec[2];
                 result.add(res);
             }
+        }
+        if(count != 0) {
+            resultAGGR[2] = resultAGGR[2] / count;
+            result.add(resultAGGR);
         }
         return result;
     }
@@ -162,7 +178,7 @@ private  IvParameterSpec iv;
             }
             double Zc =(max - uc)/sc;
             double Zu = Math.abs(agr - uu)/su;
-            if((Zc * Zu) < FuncConst.getGrabbsCriterion(n))
+            /*if((Zc * Zu) < FuncConst.getGrabbsCriterion(n))
             {
                 if (tuples.size() == 0)
                 {
@@ -172,9 +188,9 @@ private  IvParameterSpec iv;
                 result.add(id);
             }
             else
-            {
+            {*/
                 break;
-            }
+            /*}*/
         }
         return result;
     }
@@ -211,6 +227,7 @@ private  IvParameterSpec iv;
     {
         iv = i;
     }
+
 
 
 

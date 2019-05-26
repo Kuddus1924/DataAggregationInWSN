@@ -152,9 +152,9 @@ public class WSN {
         }
         return null;
     }
-    public int sum(ArrayList<int[]> list)
+    public double sum(ArrayList<int[]> list)
     {
-        int sum = 0;
+        double sum = 0;
         for(int i = 0; i < list.size();i++)
         {
             sum += list.get(i)[2];
@@ -167,7 +167,7 @@ public class WSN {
         bs.clean();
         for(int j = 0; j < levels.size(); j++ )
         {
-            for(int z = 0; z < levels.size(); z++ )
+            for(int z = 0; z < levels.get(j).size(); z++ )
             {
                 levels.get(j).get(z).clean();
             }
@@ -176,7 +176,7 @@ public class WSN {
     public static void main(String[] arg)
     {
         WSN wsn = new WSN();
-        wsn.workinWSN(2);
+        wsn.workinWSN(10);
     }
 
 

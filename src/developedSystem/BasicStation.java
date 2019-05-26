@@ -93,9 +93,9 @@ public class BasicStation {
             int[] res = findmMax(v, ig);
             double uPr = Math.abs(res[0] - uc) / sc;
             if (uPr > FuncConst.getGrabbsCriterion(value.size())) {
-                result.add(res[2]);
-                v.remove(res[3]);
-                ig.remove(res[3]);
+                result.add(res[1]);
+                v.remove(res[2]);
+                ig.remove(res[2]);
             } else {
                 break;
             }
@@ -174,23 +174,26 @@ public class BasicStation {
         badPool.add(badlist);
         int aggregetion = 0;
         int count = 0;
+        int count1 = 0;
         int[] pos = getNode(listId,badlist);
         for(int i = 0; i < result.size();i++)
         {
-            if(i == pos[count])
-            {
-                count++;
-                continue;
+            if(pos.length != 0 && count != pos.length) {
+                if (i == pos[count]) {
+                    count++;
+                    System.out.println("Did not accept result from "  + listId.get(i) + " result " + result.get(i));
+                    continue;
+                }
             }
-            else{
-                aggregetion += result.get(i);
-            }
+            aggregetion += result.get(i);
+            count1++;
         }
-        System.out.println("result aggr = " + aggregetion);
+        System.out.println("result aggr = " + (double)aggregetion/count1);
         if(badPool.size()%3 == 0)
         {
             return getBad();
         }
+        messageStore = new ArrayList<>();
         return null;
     }
     private int[] getNode(ArrayList<Integer> list,ArrayList<Integer> list1)
@@ -199,7 +202,7 @@ public class BasicStation {
         for(int z = 0;z < list1.size(); z++) {
             for (int i = 0; i < list.size(); i++) {
                 if (list.get(i) == list1.get(z)) {
-                    result[i] = z;
+                    result[z] = i;
                 }
             }
         }

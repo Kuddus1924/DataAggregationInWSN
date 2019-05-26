@@ -43,13 +43,15 @@ public class ReadNetwork {
         HashMap<Integer,Double> result = new HashMap<>();
         BufferedReader stream;
         String str;
-        String mas[];
+        String mas[] = new String[2];
         try {
             stream = new BufferedReader(new InputStreamReader(new FileInputStream(filename)));
             while ((str = stream.readLine()) != null)
             {
                 mas = str.split(" ");
-                result.put(Integer.getInteger(mas[0]),Double.valueOf(mas[1]));
+                int z = Integer.valueOf(mas[0]);
+                double z1 = Double.valueOf(mas[1]);
+                result.put(z,z1);
             }
         }
         catch (Exception e)

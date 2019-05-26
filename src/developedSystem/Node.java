@@ -1,16 +1,14 @@
 package developedSystem;
 
+import general.function.ValueModeling;
 import org.apache.commons.lang3.ArrayUtils;
 
 import javax.crypto.Mac;
 import javax.crypto.SecretKey;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
-import java.security.SecureRandom;
-import java.security.Security;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Random;
 
 public class Node {
     private int id;
@@ -24,12 +22,14 @@ public class Node {
     private BigInteger test;
     private int mod;
     private int numberGr;
+    private boolean bad ;
     private ArrayList<Message> messages = new ArrayList();
-    public Node(int id, int gr, int numberGr)
+    public Node(int id, int gr, int numberGr, boolean flag)
     {
         this.id = id;
         this.myNumber = gr;
         this.numberGr = numberGr;
+        bad = flag;
     }
     public void setKey(int key,SecretKey k) {
         this.key = key;
@@ -72,8 +72,7 @@ public class Node {
     }
     public Message sendMessage()
     {
-        physicalPhenomenon = ValueModeling.getValue();
-        System.out.println(physicalPhenomenon);
+        physicalPhenomenon = ValueModeling.getValue(bad);
         if(amIanAggregator())
         {
             BigInteger enctypt = encryptMessage();
@@ -166,5 +165,10 @@ public class Node {
     {
         return Math.random();
     }
+    public void clean()
+    {
+        messages = new ArrayList<>();
+    }
+
 
 }

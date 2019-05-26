@@ -7,7 +7,7 @@ public class Message {
     public byte[] mac;
     public boolean flag;
     public int recipient;
-    private int groupLeaderId;
+    private int groupLeaderId = 0;
 
     public Message(int id,int c ,byte[] encrypt, byte[] mac,boolean flag, int idRecipient)
     {

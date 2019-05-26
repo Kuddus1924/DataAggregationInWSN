@@ -1,7 +1,7 @@
 package SDAP;
 
 import general.function.FuncConst;
-import general.function.ReadNetwork;
+import general.function.ValueModeling;
 import org.apache.commons.lang3.ArrayUtils;
 
 import javax.crypto.Cipher;
@@ -46,7 +46,7 @@ public class Node {
     public Node(int id, int idP) {
         this.id = id;
         isNotEndNode = false;
-        physicalPhenomenon = 67;
+        physicalPhenomenon = ValueModeling.getValue(false);
         seqNumber = 0;
         idParants = idP;
     }
@@ -182,7 +182,23 @@ public class Node {
             Message mes;
             agregation.add(this.physicalPhenomenon);
             agr = sum(agregation) / agregation.size();
-            attestateMac = xorMac(mac);
+            if(mac.size() != 0) {
+                attestateMac = xorMac(mac);
+            }
+            else
+            {
+                if (idParants == 0) {
+                    mes = new Message(this.id, 1, getEncrypt(1, this.physicalPhenomenon, seqNumber, true), getByteMac(0, 1, this.physicalPhenomenon, null, this.seqNumber, false), false, idParants);
+                }
+                else
+                {
+                    mes = new Message(this.id, 1, getEncrypt(1, this.physicalPhenomenon, seqNumber, false), getByteMac(0, 1, this.physicalPhenomenon, null, this.seqNumber, false), false, idParants);
+
+                }
+                this.message = mes;
+                this.attestateMac = getByteMac(0, 1, this.physicalPhenomenon, null, this.seqNumber, false);
+                return mes;
+            }
             if (FuncConst.FunctionH(this.seqNumber, this.id) < FuncConst.FunctionG(c)) {
                 mes = new Message(id, c, getEncrypt(c, agr, this.seqNumber, true), getByteMac(1, c, agr, xorMac(mac), this.seqNumber, true), true, this.idParants);//если лидер
             } else {
@@ -219,7 +235,7 @@ public class Node {
                 store[1] = tmp.getId();
                 store[2] = tmp.getGroupLeaderId();
                 shippingTable.add(store);
-                tmp.setRecipient(this.id);
+                tmp.setRecipient(this.idParants);
                 result.add(tmp);
             }
         }

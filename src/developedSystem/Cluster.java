@@ -6,7 +6,7 @@ import java.util.Random;
 
 public class Cluster {
     private ArrayList<Node> nodes = new ArrayList<>();
-    private int idLeader;
+    private int idLeader = 0;
     private int seed;
     private Random random = new Random();
     private int id;
@@ -27,6 +27,8 @@ public class Cluster {
     }
     public void setBadlist(ArrayList<Integer> badList)
     {
+        if(badList.size() == 0)
+            return;
         for(int i = 0;i < badList.size();i++) {
             this.badlist.add(badList.get(i));
         }
@@ -58,30 +60,36 @@ public class Cluster {
         }
         return nodes.get(idLeader).sendMessage();
     }
-    public void createNodes(int start,int end,int key,SecretKey k)
+    public void createNodes(int start,int end,int key,SecretKey k,int badnode)
     {
         int count = 0;
         for (int i = start + 1; i <= end;i++)
         {
-            nodes.add(new Node(i,count,id));
+            if(count < badnode) {
+                nodes.add(new Node(i, count, id, true));
+            }
+            else {
+                nodes.add(new Node(i, count, id, false));
+            }
             count++;
         }
         this.setKey(key,k);
     }
     public  int  selectionAggregation()
     {
-          for(int i = 0;i < nodes.size();i++)
-          {
-                if(checklist(i))
-                {
-                    if(nodes.get(i).generateNumber() < (1 - 0.5*(listAggregation.size()% 20)))
-                    {
-                        idLeader = i;
-                        return  i;
+            while (true) {
+                for (int i = 0; i < nodes.size(); i++) {
+                    if (checklist(i)) {
+                        if (nodes.get(i).generateNumber() < (0.05) / (1 - 0.05 * (listAggregation.size() % 20))) //поменять формулу
+                        {
+                            idLeader = i;
+                            System.out.println("id group - " + id +" " + "idLeader -" + nodes.get(i).getId());
+                            listAggregation.add(i);
+                            return i;
+                        }
                     }
                 }
-          }
-          return random.nextInt(nodes.size());
+            }
     }
     public boolean checklist(int i)
     {
@@ -103,6 +111,7 @@ public class Cluster {
     }
     public Message startWorking(Integer sq)
     {
+        end();
         setNumberSeq(sq);
         int select = selectionAggregation();
         for(int i = 0; i < nodes.size(); i++)
@@ -113,8 +122,13 @@ public class Cluster {
     }
     public Message continueWork(Integer sq)
     {
+        end();
         setNumberSeq(sq);
         return getMessageGroup();
+    }
+    private void end()
+    {
+        nodes.get(idLeader).clean();
     }
 
 

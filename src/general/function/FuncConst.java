@@ -11,7 +11,7 @@ public  class FuncConst {
     public static HashMap<Integer,Double> tableGrubs = readTable("C:\\Users\\kuddu\\Desktop\\Диплом\\grubbs.txt");
     public static double FunctionG(int c)
     {
-        return Math.pow((1.0 - Math.exp(-1*0.3*c)),5);
+        return Math.pow((1.0 - Math.exp(-1*0.3*c)),2);
     }
     public static double FunctionH(int sq,int id)
     {
