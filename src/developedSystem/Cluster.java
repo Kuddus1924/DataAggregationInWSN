@@ -17,7 +17,7 @@ public class Cluster {
     {
         nodes.add(node);
     }
-    public Cluster(int id)
+        public Cluster(int id)
     {
         this.id = id;
         for(int i = 0; i < 21; i++)
@@ -83,7 +83,7 @@ public class Cluster {
                         if (nodes.get(i).generateNumber() < (0.05) / (1 - 0.05 * (listAggregation.size() % 20))) //поменять формулу
                         {
                             idLeader = i;
-                            System.out.println("id group - " + id +" " + "idLeader -" + nodes.get(i).getId());
+                            //System.out.println("id group - " + id +" " + "idLeader -" + nodes.get(i).getId());
                             listAggregation.add(i);
                             return i;
                         }
@@ -93,7 +93,7 @@ public class Cluster {
     }
     public boolean checklist(int i)
     {
-        for (int z = listAggregation.size() - 1;z >=  listAggregation.size() - 20; z--)
+        for (int z = listAggregation.size() - 1;z >=  listAggregation.size() - 10; z--)
         {
             if(i == listAggregation.get(z))
             {

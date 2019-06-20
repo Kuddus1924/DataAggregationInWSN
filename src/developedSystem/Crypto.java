@@ -13,8 +13,7 @@ public class Crypto {
                 z.add(i);
         }
         Random random = new Random();
-        //return z.get(random.nextInt(z.size()));
-        return 17;
+        return z.get(random.nextInt(z.size()));
 
     }
     private static int gcd(int a, int b)

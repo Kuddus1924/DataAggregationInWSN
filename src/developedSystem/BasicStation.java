@@ -73,26 +73,24 @@ public class BasicStation {
     }
 
     public ArrayList<Integer> GrubbsTest(ArrayList<Integer> value, ArrayList<Integer> idGr) {
-        int n = value.size();
         ArrayList<Integer> result = new ArrayList<>();
-        double uc = 0;
-        double sc = 0;
         ArrayList<Integer> v = new ArrayList<>(value);
         ArrayList<Integer> ig = new ArrayList<>(idGr);
-        for (int i = 0; i < value.size(); i++) {
-            uc += value.get(i);
-        }
-        uc /= value.size();
-        for (int i = 0; i < value.size(); i++) {
-            sc += Math.pow(value.get(i) - uc, 2);
-        }
-        sc /= value.size() - 1;
-        sc = Math.sqrt(sc);
-
-        for (int i = 0; i < value.size(); i++) {
+        for (int j = 0; j < value.size(); j++) {
+            double uc = 0;
+            double sc = 0;
+            for (int i = 0; i < v.size(); i++) {
+                uc += v.get(i);
+            }
+            uc /= v.size();
+            for (int i = 0; i < v.size(); i++) {
+                sc += Math.pow(v.get(i) - uc, 2);
+            }
+            sc /= v.size() - 1;
+            sc = Math.sqrt(sc);
             int[] res = findmMax(v, ig);
             double uPr = Math.abs(res[0] - uc) / sc;
-            if (uPr > FuncConst.getGrabbsCriterion(value.size())) {
+            if (uPr > FuncConst.getGrabbsCriterion(v.size() - 1)) {
                 result.add(res[1]);
                 v.remove(res[2]);
                 ig.remove(res[2]);
@@ -160,35 +158,77 @@ public class BasicStation {
     }
     public ArrayList<Integer> result()
     {
-        ArrayList<Integer> result = new ArrayList<>();
-        ArrayList<Integer> listId = new ArrayList<>();
+        ArrayList<Integer> result ;
+        ArrayList<Integer> listId ;
+        ArrayList<ArrayList<Message>>list = new ArrayList<>();
+        ArrayList<ArrayList<Integer>>  listid = new ArrayList<>();
+        for(int i = 0; i < 4;i++)
+        {
+            list.add(new ArrayList<Message>());
+            listid.add(new ArrayList<Integer>());
+        }
         for(int i = 0; i < messageStore.size(); i++)
         {
             if (checkMAC(messageStore.get(i).getMac(), createMac(messageStore.get(i).getId(), messageStore.get(i).message, NumberSeq),messageStore.get(i).getIdgr()))
             {
-                result.add(encrypt(messageStore.get(i)));
-                listId.add(messageStore.get(i).getId());
+                list.get(i%4).add(messageStore.get(i));
+                listid.get(i%4).add(messageStore.get(i).getId());
             }
         }
+        ArrayList<Worker> workers = new ArrayList<>();
+        for(int i = 0; i < 4;i++)
+        {
+            workers.add(new Worker(N,z,list.get(i),listid.get(i)));
+            workers.get(i).run();
+        }
+        for(int i = 0; i < 4;i++)
+        {
+            try {
+                workers.get(i).join();
+            }
+            catch (Exception e)
+            {
+                System.out.println(e.getMessage());
+            }
+        }
+        result = new ArrayList<>(workers.get(0).getResult());
+        listId = new ArrayList<>(workers.get(0).getIds());
+        for(int i = 1;i < 4;i++)
+        {
+            result.addAll(workers.get(i).getResult());
+            listId.addAll(workers.get(i).getIds());
+        }
+
         ArrayList<Integer> badlist = GrubbsTest(result,listId);
         badPool.add(badlist);
         int aggregetion = 0;
         int count = 0;
         int count1 = 0;
+        ArrayList<Integer> stat = new ArrayList<>();
+        Boolean flag  = false;
         int[] pos = getNode(listId,badlist);
         for(int i = 0; i < result.size();i++)
         {
+            flag = false;
             if(pos.length != 0 && count != pos.length) {
-                if (i == pos[count]) {
-                    count++;
-                    System.out.println("Did not accept result from "  + listId.get(i) + " result " + result.get(i));
-                    continue;
+                for(int z = 0 ; z < pos.length;z++) {
+                    if (i == pos[z]) {
+                        System.out.println("Did not accept result from " + listId.get(i) + " result " + result.get(i));
+                        flag = true;
+                        break;
+
+                    }
                 }
             }
-            aggregetion += result.get(i);
-            count1++;
+            if(!flag) {
+                stat.add(result.get(i));
+                aggregetion += result.get(i);
+                count1++;
+            }
         }
         System.out.println("result aggr = " + (double)aggregetion/count1);
+        System.out.println("M = " + getM(stat));
+        System.out.println("D = " + getD(stat,getM(stat)));
         if(badPool.size()%3 == 0)
         {
             return getBad();
@@ -230,10 +270,167 @@ public class BasicStation {
         for(int i = 0; i < list2.size(); i++) {
             for (int z = 0; z < list3.size(); z++) {
                 if (list2.get(i) == list3.get(z))
-                    result.add(list1.get(i));
+                    result.add(list2.get(i));
             }
         }
         return new ArrayList<>(result);
+    }
+    public double getBadlistSize()
+    {
+        double res = 0.0;
+        for(int i = 0; i < badPool.size(); i++)
+        {
+            res+=badPool.get(i).size();
+        }
+
+        return res;
+    }
+    public ArrayList<Integer> GrubbsTest1(ArrayList<Integer> value, ArrayList<Integer> idGr) {
+        ArrayList<Integer> result = new ArrayList<>();
+        ArrayList<Integer> v = new ArrayList<>(value);
+        ArrayList<Integer> ig = new ArrayList<>(idGr);
+        for (int j = 0; j < value.size(); j++) {
+            ArrayList<Integer> sort = new ArrayList<>(v);
+            ArrayList<Integer> raz = new ArrayList<>();
+            Collections.sort(sort);
+            int max = 0;
+            int indexMax = 0;
+            for(int i = 0; i < sort.size() - 1;i++)
+            {
+                raz.add(sort.get(i + 1) - sort.get(i));
+                if(raz.get(i) > max)
+                {
+                    indexMax = i;
+                    max = raz.get(i);
+                }
+            }
+            if((indexMax + 1 >= sort.size() * 0.3) &&(indexMax + 1 <= sort.size() - sort.size() * 0.3 ))
+            {
+                return result;
+            }
+            ArrayList<Integer> sortNew = new ArrayList<>();
+            if(indexMax + 1< sort.size() * 0.3)
+            {
+                for(int i = indexMax; i < sort.size();i++)
+                {
+                    sortNew.add(sort.get(i));
+                }
+            }
+            if(indexMax + 1 >  sort.size() - sort.size() * 0.3)
+            {
+                for(int i = 0; i <= indexMax;i++)
+                {
+                    sortNew.add(sort.get(i));
+                }
+            }
+            double uc = 0;
+            double sc = 0;
+            for (int i = 0; i < sortNew.size(); i++) {
+                uc += sortNew.get(i) * sortNew.size();
+            }
+            uc /= sortNew.size();
+            for (int i = 0; i < sortNew.size(); i++) {
+                sc += Math.pow(sortNew.get(i) - uc, 2) * sortNew.size();
+            }
+            sc /= sortNew.size() - 1;
+            sc = Math.sqrt(sc);
+            int[] res = findmMax(v, ig);
+            double uPr = Math.abs(uc - max) / sc;
+            if (uPr > FuncConst.getGrabbsCriterion(sort.size())) {
+                result.add(res[1]);
+                v.remove(res[2]);
+                ig.remove(res[2]);
+            } else {
+                break;
+            }
+        }
+        return result;
+    }
+    public double getM(ArrayList<Integer> ls)
+    {
+        ArrayList<Integer> count= new ArrayList<>();
+        HashSet<Integer> res = new HashSet<>(ls);
+        ArrayList<Integer> result = new ArrayList<>(res);
+        int c = 0;
+        for(int i = 0;i < result.size();i++)
+        {
+            c = 0;
+            for(int j = 0; j< ls.size(); j++)
+            {
+                if(result.get(i) == ls.get(j))
+                    c++;
+            }
+            count.add(c);
+        }
+        double M = 0;
+        for(int i = 0; i < result.size();i++)
+        {
+            double y = count.get(i);
+            double jz =ls.size();
+            double neo =  result.get(i);
+            M += (y/jz) * neo;
+        }
+        return M;
+    }
+    public double getD(ArrayList<Integer> ls, Double M)
+    {
+        ArrayList<Integer> count= new ArrayList<>();
+        HashSet<Integer> res = new HashSet<>(ls);
+        ArrayList<Integer> result = new ArrayList<>(res);
+        int c = 0;
+        for(int i = 0;i < result.size();i++)
+        {
+            c = 0;
+            for(int j = 0; j< ls.size(); j++)
+            {
+                if(result.get(i) == ls.get(j))
+                    c++;
+            }
+            count.add(c);
+        }
+        double D = 0;
+        for(int i = 0; i < result.size();i++)
+        {
+            double y = count.get(i);
+            double jz =ls.size();
+            D += (y/jz) * Math.pow((result.get(i) - M),2);
+        }
+        return D;
+    }
+    private class Worker extends Thread
+    {
+        private int N;
+        private int z;
+        private ArrayList<Message> data;
+        private ArrayList<Integer> id;
+        private ArrayList<Integer> result = new ArrayList<>();
+        public Worker(int N, int z, ArrayList<Message> data,ArrayList<Integer> id)
+        {
+            this.N = N;
+            this.z = z;
+            this.data = data;
+            this.id = id;
+        }
+        @Override
+        public void run()
+        {
+            for(int i = 0;i < data.size();i++)
+            {
+                result.add(encrypt(data.get(i)));
+            }
+        }
+        private int encrypt(Message mes) {
+            BigInteger enc = mes.message;
+            BigInteger v = enc.pow(z).subtract(BigInteger.ONE).mod(new BigInteger(Integer.toString(N * N))).divide(new BigInteger(Integer.toString(N)));
+            return v.intValue() / getParticipants(mes.getActiveNodes(), 30);
+        }
+        public ArrayList<Integer> getResult()
+        {
+            return result;
+        }
+        public ArrayList<Integer> getIds() {
+            return id;
+        }
     }
 
 

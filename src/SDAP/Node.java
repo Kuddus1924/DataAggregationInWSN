@@ -110,30 +110,6 @@ public class Node {
         }
     }
 
-    /*public boolean checkMAC(byte[] macNode, int idNode, byte[] message) {
-        if (isNotEndNode) {
-            SecretKey key = keyStore.get(idNode);
-            if (key == null) {
-                return false;
-            }
-            try {
-                Mac mac = Mac.getInstance(algo);
-                mac.init(key);
-                if (Arrays.equals(macNode, mac.doFinal(message)))
-                    return true;
-                else
-                    return false;
-            } catch (Exception e) {
-                System.out.println(e.getMessage());
-            }
-
-        } else {
-            System.out.println("Error! This node is not an aggregator");
-            return false;
-        }
-        return false;
-    }*/
-
     public byte[] generateEncryptMessage(byte[] message, boolean bs) throws Exception {
         Cipher cipher = Cipher.getInstance("AES/CTR/NoPadding");
         if(bs)
@@ -152,6 +128,12 @@ public class Node {
     }
 
     public Message getMessageParants(int count) {
+        if(Math.random() < 0.4) {
+            physicalPhenomenon = ValueModeling.getValue(true);
+        }
+        else {
+            physicalPhenomenon = ValueModeling.getValue(false);
+        }
         this.seqNumber = count;
         if (isNotEndNode) {
             ArrayList<Integer> agregation = new ArrayList<>();

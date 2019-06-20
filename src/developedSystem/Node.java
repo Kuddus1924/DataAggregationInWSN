@@ -73,6 +73,10 @@ public class Node {
     public Message sendMessage()
     {
         physicalPhenomenon = ValueModeling.getValue(bad);
+        if(bad)
+        {
+            physicalPhenomenon  = physicalPhenomenon * (numberGr + 2);
+        }
         if(amIanAggregator())
         {
             BigInteger enctypt = encryptMessage();

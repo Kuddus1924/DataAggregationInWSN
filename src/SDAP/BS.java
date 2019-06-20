@@ -1,6 +1,7 @@
 package SDAP;
 
 import general.function.*;
+import org.apache.commons.math3.distribution.TDistribution;
 
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
@@ -142,9 +143,9 @@ private  IvParameterSpec iv;
     }
     public ArrayList<Integer> grubbsTest(ArrayList<int[]> tuples)
     {
-        int n = tuples.size();
         ArrayList<Integer> result = new ArrayList<>();
         while (true) {
+            int n = tuples.size();
             double uc = 0;
             double sc = 0;
             double uu = 0;
@@ -178,7 +179,7 @@ private  IvParameterSpec iv;
             }
             double Zc =(max - uc)/sc;
             double Zu = Math.abs(agr - uu)/su;
-            /*if((Zc * Zu) < FuncConst.getGrabbsCriterion(n))
+            if((getProbality(Zc,n) * getProbality(Zu,n)) < 0.05)
             {
                 if (tuples.size() == 0)
                 {
@@ -188,9 +189,9 @@ private  IvParameterSpec iv;
                 result.add(id);
             }
             else
-            {*/
+            {
                 break;
-            /*}*/
+            }
         }
         return result;
     }
@@ -226,6 +227,12 @@ private  IvParameterSpec iv;
     public void setIv(IvParameterSpec i)
     {
         iv = i;
+    }
+    private   double getProbality(double z,int n) {
+        double t = Math.sqrt(((n - 2) * n * Math.pow(z, 2)) / (Math.pow(n - 1, 2) - n * Math.pow(z, 2)));
+        TDistribution td = new TDistribution(n-2);
+        double p = (1 - td.cumulativeProbability(t)) * n;
+        return p;
     }
 
 

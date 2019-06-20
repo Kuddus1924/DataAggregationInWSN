@@ -5,12 +5,15 @@ import general.function.ReadNetwork;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 
 public class WSN {
     ArrayList<ArrayList<Node>> levels = new ArrayList<>();
     BS bs;
 
     public void workinWSN(int quantityRequests) {
+        ArrayList<Double> m = new ArrayList<>();
+        ArrayList<Double> ddd = new ArrayList<>();
         ArrayList<ArrayList<Integer>> connections = ReadNetwork.read("WSN.txt");
         bs = new BS();
         int count = 1;
@@ -133,12 +136,20 @@ public class WSN {
                         break;
                     }
                 }
-
             }
+            ArrayList<Integer> listgg = new ArrayList<>();
+            for(int p = 0; p < decryptMesBS.size();p++)
+            {
+                listgg.add(decryptMesBS.get(p)[2]);
+            }
+            m.add(getM(listgg));
+            ddd.add(getD(listgg,getM(listgg)));
             System.out.println("aggregation result: "  + sum(decryptMesBS));
             clean();
-
         }
+        System.out.println("M=" + crednee(m));
+        System.out.println("D=" + crednee(ddd));
+
     }
     public Node getNode(int id)
     {
@@ -151,6 +162,15 @@ public class WSN {
             }
         }
         return null;
+    }
+    public double crednee(ArrayList<Double> list)
+    {
+        double gavno = 0;
+        for(int i = 0;i < list.size();i++)
+        {
+            gavno += list.get(i);
+        }
+        return gavno/list.size();
     }
     public double sum(ArrayList<int[]> list)
     {
@@ -176,7 +196,58 @@ public class WSN {
     public static void main(String[] arg)
     {
         WSN wsn = new WSN();
-        wsn.workinWSN(10);
+        wsn.workinWSN(100);
+    }
+    public double getM(ArrayList<Integer> ls)
+    {
+        ArrayList<Integer> count= new ArrayList<>();
+        HashSet<Integer> res = new HashSet<>(ls);
+        ArrayList<Integer> result = new ArrayList<>(res);
+        int c = 0;
+        for(int i = 0;i < result.size();i++)
+        {
+            c = 0;
+            for(int j = 0; j< ls.size(); j++)
+            {
+                if(result.get(i) == ls.get(j))
+                    c++;
+            }
+            count.add(c);
+        }
+        double M = 0;
+        for(int i = 0; i < result.size();i++)
+        {
+            double y = count.get(i);
+            double jz =ls.size();
+            double neo =  result.get(i);
+            M += (y/jz) * neo;
+        }
+        return M;
+    }
+    public double getD(ArrayList<Integer> ls, Double M)
+    {
+        ArrayList<Integer> count= new ArrayList<>();
+        HashSet<Integer> res = new HashSet<>(ls);
+        ArrayList<Integer> result = new ArrayList<>(res);
+        int c = 0;
+        for(int i = 0;i < result.size();i++)
+        {
+            c = 0;
+            for(int j = 0; j< ls.size(); j++)
+            {
+                if(result.get(i) == ls.get(j))
+                    c++;
+            }
+            count.add(c);
+        }
+        double D = 0;
+        for(int i = 0; i < result.size();i++)
+        {
+            double y = count.get(i);
+            double jz =ls.size();
+            D += (y/jz) * Math.pow((result.get(i) - M),2);
+        }
+        return D;
     }
 
 
